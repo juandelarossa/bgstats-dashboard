@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>BG Stats Dashboard</title>
+  <meta name="description" content="Gratis, open source dashboard voor je BG Stats-export, inclusief je Board Game Arena-potjes. Alles blijft in je eigen browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%B2%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Lilita+One&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="track-strip" aria-hidden="true"></div>
+<header class="masthead">
+  <div class="brand">
+    <button type="button" class="die" id="die" title="Rol de dobbelsteen voor een willekeurig spel" aria-label="Kies een willekeurig spel"><i></i><i></i><i></i><i></i><i></i></button>
+    <div>
+      <h1 aria-label="BG Stats Dashboard"><span aria-hidden="true"><b>B</b><b>G</b> <b>S</b><b>t</b><b>a</b><b>t</b><b>s</b> <b>D</b><b>a</b><b>s</b><b>h</b><b>b</b><b>o</b><b>a</b><b>r</b><b>d</b></span></h1>
+      <p class="source"><span id="source-line">Laden…</span> · Rol de dobbelsteen: wat spelen we?</p>
+    </div>
+  </div>
+  <label class="button upload" id="upload-label" hidden>
+    Nieuwe export uploaden
+    <input type="file" id="upload" accept=".json,.bgsplay" hidden>
+  </label>
+</header>
+
+<aside class="scope-note" id="scope-note" hidden></aside>
+
+<div class="controls" id="controls">
+  <div class="controls-row">
+    <div class="tokens" role="group" aria-label="Soort potjes" id="type-tokens">
+      <button type="button" data-type="Alles">Alles</button>
+      <button type="button" data-type="Live">🎲 Live</button>
+      <button type="button" data-type="Digitaal">💻 Digitaal</button>
+    </div>
+    <label class="who">
+      <span>Bekijk als</span>
+      <select id="me"></select>
+    </label>
+    <button type="button" class="button" id="toggle-filters" aria-expanded="false">Filters</button>
+  </div>
+  <div class="filters" id="filters" hidden>
+    <label><span>Periode</span><select id="f-period"></select></label>
+    <label class="custom" id="custom-from" hidden><span>Vanaf</span><input type="date" id="f-from"></label>
+    <label class="custom" id="custom-to" hidden><span>Tot en met</span><input type="date" id="f-to"></label>
+    <label><span>Spel</span><select id="f-game"></select></label>
+    <label><span>Gespeeld met</span><select id="f-mate"></select></label>
+    <label><span>Locatie</span><select id="f-loc"></select></label>
+    <label><span>Aantal spelers</span><select id="f-size"></select></label>
+    <label><span>Soort spel</span><select id="f-kind"></select></label>
+    <label><span>Genre</span><select id="f-genre"></select></label>
+  </div>
+  <div class="chips" id="chips" hidden></div>
+  <div class="views-row"><span class="views-label">Bekijk</span><nav class="views" id="views" aria-label="Onderdelen"></nav></div>
+</div>
+
+<div class="notice" id="notice" hidden></div>
+<main id="main"></main>
+<div class="tooltip" id="tooltip" hidden></div>
+<dialog id="game-dialog" aria-label="Spel"></dialog>
+
+<footer class="site-foot">Open source · <a href="https://github.com/juandelarossa/bgstats-dashboard">broncode op GitHub</a> · niet verbonden aan BG Stats, Board Game Arena of BoardGameGeek</footer>
+<script>window.PUBLIC_MODE = true;</script>
+<script src="game-info.js"></script>
+<script src="demo.js"></script>
+<script src="bgstats.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
