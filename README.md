@@ -16,6 +16,8 @@ met "Wis mijn gegevens van dit apparaat" haal je ze weg.
 
 ## Wat zit erin
 
+- 🌐 In zeven talen: English, Nederlands, Deutsch, Français, Español, Italiano en Português
+
 - Scorekaart met winratio, reeksen, vorm en een prijzenkast
 - **Hoe goed ben je per spel?** Gemiddelde eindplaats, hoeveel tegenstanders achter je eindigden, trend, winratio per aantal spelers en als startspeler
 - Live tegen digitaal (Board Game Arena, Yucata, Tabletop Simulator) als filter op alles
@@ -35,4 +37,5 @@ Niet verbonden aan BG Stats, Board Game Arena of BoardGameGeek. Covers en spelge
 
 **English:** a free dashboard for your BG Stats export, including Board Game Arena plays.
 Open the page, pick your BG Stats `.json` export and everything is calculated in your own browser; nothing is uploaded.
-The interface is in Dutch for now.
+
+🌐 Available in English, Nederlands, Deutsch, Français, Español, Italiano and Português. The page picks your browser language; switch any time at the top.

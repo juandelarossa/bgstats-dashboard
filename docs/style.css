@@ -425,7 +425,7 @@ dialog::backdrop { background: rgb(42 31 78 / 62%); }
 .button.big { padding: 13px 20px; font-size: 17px; }
 .button.ghost { background: var(--card); }
 body.dropping::after {
-  content: "Laat los om je export in te lezen"; position: fixed; inset: 12px; z-index: 40; display: grid; place-content: center;
+  content: attr(data-drop); position: fixed; inset: 12px; z-index: 40; display: grid; place-content: center;
   border: 4px dashed var(--line); border-radius: 24px; background: rgb(255 243 209 / 92%); color: var(--ink); font: 400 28px var(--display);
 }
 .bga-link { color: var(--ink); font-weight: 800; white-space: nowrap; }
@@ -436,3 +436,9 @@ body.dropping::after {
 }
 .site-foot { max-width: 1240px; margin: 28px auto 0; color: var(--ink-2); font-size: 13px; font-weight: 700; text-align: center; }
 .site-foot a { color: var(--ink); }
+
+/* Taalkeuze */
+.head-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.lang { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border: 3px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: 3px 3px 0 var(--line); }
+.lang select { width: auto; padding: 4px 6px; border: 0; background: transparent; font-weight: 800; }
+h1 .word { white-space: nowrap; }

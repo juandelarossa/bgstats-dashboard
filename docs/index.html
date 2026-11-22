@@ -16,14 +16,17 @@
   <div class="brand">
     <button type="button" class="die" id="die" title="Rol de dobbelsteen voor een willekeurig spel" aria-label="Kies een willekeurig spel"><i></i><i></i><i></i><i></i><i></i></button>
     <div>
-      <h1 aria-label="BG Stats Dashboard"><span aria-hidden="true"><b>B</b><b>G</b> <b>S</b><b>t</b><b>a</b><b>t</b><b>s</b> <b>D</b><b>a</b><b>s</b><b>h</b><b>b</b><b>o</b><b>a</b><b>r</b><b>d</b></span></h1>
+      <h1 aria-label="BG Stats Dashboard"><span aria-hidden="true"><span class="word"><b>B</b><b>G</b></span> <span class="word"><b>S</b><b>t</b><b>a</b><b>t</b><b>s</b></span> <span class="word"><b>D</b><b>a</b><b>s</b><b>h</b><b>b</b><b>o</b><b>a</b><b>r</b><b>d</b></span></span></h1>
       <p class="source"><span id="source-line">Laden…</span> · Rol de dobbelsteen: wat spelen we?</p>
     </div>
   </div>
+  <div class="head-actions">
+  <label class="lang"><span aria-hidden="true">🌐</span><select id="lang" aria-label="Taal / Language"></select></label>
   <label class="button upload" id="upload-label" hidden>
     Nieuwe export uploaden
     <input type="file" id="upload" accept=".json,.bgsplay" hidden>
   </label>
+  </div>
 </header>
 
 <aside class="scope-note" id="scope-note" hidden></aside>
@@ -66,6 +69,8 @@
 <script src="game-info.js"></script>
 <script src="demo.js"></script>
 <script src="bgstats.js"></script>
+<script src="i18n.js"></script>
+<script src="translations.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

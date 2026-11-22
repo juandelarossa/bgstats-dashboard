@@ -8,9 +8,12 @@ const NO_NAME = "Onbekende speler";
 const THE_GAME = "Het spel";
 const POLL_MS = 10000;
 const PAGE_SIZE = 30;
-const MONTHS = ["jan", "feb", "mrt", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec"];
-const DAYS = ["ma", "di", "wo", "do", "vr", "za", "zo"];
-const DAY_NAMES = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"];
+/* Maand- en dagnamen in de gekozen taal (LOCALE komt uit i18n.js). 5 januari 2026 is een maandag. */
+const MONTHS = Array.from({ length: 12 }, (_, m) => new Intl.DateTimeFormat(LOCALE, { month: "short" }).format(new Date(2026, m, 1)).replace(".", ""));
+const DAYS = Array.from({ length: 7 }, (_, d) => new Intl.DateTimeFormat(LOCALE, { weekday: "short" }).format(new Date(2026, 0, 5 + d)).replace(".", "").slice(0, 3));
+const DAY_NAMES = Array.from({ length: 7 }, (_, d) => new Intl.DateTimeFormat(LOCALE, { weekday: "long" }).format(new Date(2026, 0, 5 + d)));
+const DATE_FORMAT = new Intl.DateTimeFormat(LOCALE, { day: "numeric", month: "short", year: "numeric" });
+const MONTH_FORMAT = new Intl.DateTimeFormat(LOCALE, { month: "short", year: "numeric" });
 /* Online speel je vaker tegen onbekenden; daar staan de spellen meer voorop. */
 const VIEWS = IS_PUBLIC ? [
   ["overzicht", "Alles op één pagina", "🎲"], ["spellen", "Spellen", "🃏"], ["genres", "Genres", "🎭"], ["klassement", "Klassement", "🏆"],
@@ -40,14 +43,14 @@ let version = null;
 
 const $ = (id) => document.getElementById(id);
 const esc = (text) => String(text ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-const num = (value) => Number(value).toLocaleString("nl-NL");
-const rate = (value, digits = 0) => (value === null ? "–" : `${(value * 100).toLocaleString("nl-NL", { maximumFractionDigits: digits, minimumFractionDigits: digits })}%`);
+const num = (value) => Number(value).toLocaleString(LOCALE);
+const rate = (value, digits = 0) => (value === null ? "–" : `${(value * 100).toLocaleString(LOCALE, { maximumFractionDigits: digits, minimumFractionDigits: digits })}%`);
 const plural = (n, one, many) => `${num(n)} ${n === 1 ? one : many}`;
-const dateLabel = (p) => `${p.day} ${MONTHS[p.month]} ${p.year}`;
-const monthLabel = (key) => `${MONTHS[Number(key.slice(5, 7)) - 1]} ${key.slice(0, 4)}`;
+const dateLabel = (p) => DATE_FORMAT.format(p.date);
+const monthLabel = (key) => MONTH_FORMAT.format(new Date(Number(key.slice(0, 4)), Number(key.slice(5, 7)) - 1, 1));
 const minutesOf = (list) => list.reduce((sum, p) => sum + p.game.minutes, 0);
 const duration = (minutes) => (!minutes ? "–" : minutes < 90 ? `${num(Math.round(minutes))} min` : `${num(Math.round(minutes / 60))} uur`);
-const daysOf = (minutes) => (minutes / 1440).toLocaleString("nl-NL", { maximumFractionDigits: 1 });
+const daysOf = (minutes) => (minutes / 1440).toLocaleString(LOCALE, { maximumFractionDigits: 1 });
 const initials = (name) => name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 const storageGet = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
 const storageSet = (key, value) => { try { localStorage.setItem(key, value); } catch { /* optioneel */ } };
@@ -212,14 +215,14 @@ function buildFilters() {
   const years = [...new Set(db.plays.map((p) => p.year))].sort((a, b) => b - a);
   fillSelect("f-period", [["all", "Altijd"], ["d30", "Laatste 30 dagen"], ["d90", "Laatste 90 dagen"], ["d365", "Laatste 12 maanden"],
     ...years.map((y) => [`y${y}`, String(y)]), ["custom", "Zelf kiezen"]], state.period);
-  const names = [...new Set(db.plays.map((p) => p.game.name))].sort((a, b) => a.localeCompare(b, "nl"));
+  const names = [...new Set(db.plays.map((p) => p.game.name))].sort((a, b) => a.localeCompare(b, LOCALE));
   fillSelect("f-game", [["", "Alle spellen"], ...names.map((n) => [n, n])], state.game);
   fillSelect("f-mate", [["", "Iedereen"], ...people.map(([n]) => [n, n])], state.mate);
   const locs = [...groupBy(db.plays, (p) => p.location).entries()].sort((a, b) => b[1].length - a[1].length).map(([n]) => [n, n]);
   fillSelect("f-loc", [["", "Alle locaties"], ...locs], state.loc);
   fillSelect("f-size", [["", "Alle aantallen"], ["1", "Solo"], ["2", "2 spelers"], ["3", "3 spelers"], ["4", "4 spelers"], ["5+", "5 of meer"]], state.size);
   fillSelect("f-kind", [["", "Alle soorten"], ["comp", "Tegen elkaar"], ["coop", "Coöperatief"]], state.kind);
-  const genres = Object.entries(db.genres).map(([key, g]) => [key, `${g.icon} ${g.label}`]).sort((a, b) => a[1].slice(3).localeCompare(b[1].slice(3), "nl"));
+  const genres = Object.entries(db.genres).map(([key, g]) => [key, `${g.icon} ${g.label}`]).sort((a, b) => a[1].slice(3).localeCompare(b[1].slice(3), LOCALE));
   fillSelect("f-genre", [["", "Alle genres"], ...genres], state.genre);
 }
 
@@ -348,7 +351,7 @@ function calendar(width, plays) {
       }
     }
     const names = [...new Set(list.map((p) => p.game.name))].slice(0, 4).join(", ");
-    out += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="2.5" fill="${typeShade(list.length / max)}" data-tip="${esc(`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}: ${plural(list.length, "potje", "potjes")}${names ? `\n${names}` : ""}`)}"/>`;
+    out += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="2.5" fill="${typeShade(list.length / max)}" data-tip="${esc(`${DATE_FORMAT.format(d)}: ${plural(list.length, "potje", "potjes")}${names ? `\n${names}` : ""}`)}"/>`;
   }
   return svg(26 + weeks * (cell + gap), height, out, "Kalender van speeldagen");
 }
@@ -691,7 +694,7 @@ function gameStats(list, name) {
   };
 }
 
-const oneDecimal = (value) => (value === null ? "–" : (Math.round(value * 10) / 10).toLocaleString("nl-NL"));
+const oneDecimal = (value) => (value === null ? "–" : (Math.round(value * 10) / 10).toLocaleString(LOCALE));
 function trendLabel(diff) {
   if (diff === null) return '<span class="muted">–</span>';
   const points = Math.round(diff * 100);
@@ -723,7 +726,7 @@ function viewGames() {
   const search = state.gameSearch.toLowerCase();
   const sorters = {
     plays: (a, b) => b.plays - a.plays, rate: (a, b) => (b.rate ?? -1) - (a.rate ?? -1), last: (a, b) => (a.last < b.last ? 1 : -1),
-    time: (a, b) => b.minutes - a.minutes, year: (a, b) => (b.game.year || 0) - (a.game.year || 0), name: (a, b) => a.name.localeCompare(b.name, "nl"),
+    time: (a, b) => b.minutes - a.minutes, year: (a, b) => (b.game.year || 0) - (a.game.year || 0), name: (a, b) => a.name.localeCompare(b.name, LOCALE),
   };
   const shown = rows.filter((r) => r.name.toLowerCase().includes(search)).sort(sorters[state.gameSort]);
   const designers = new Map();
@@ -1173,9 +1176,9 @@ function bindEvents() {
 
   if (IS_PUBLIC) {
     $("upload-label").hidden = false;
-    $("upload-label").firstChild.textContent = "Ander bestand kiezen ";
+    $("upload-label").firstChild.textContent = `${tr("Ander bestand kiezen")} `;
     $("upload").addEventListener("change", (e) => { readLocalFile(e.target.files[0]); e.target.value = ""; });
-    addEventListener("dragover", (e) => { e.preventDefault(); document.body.classList.add("dropping"); });
+    addEventListener("dragover", (e) => { e.preventDefault(); document.body.dataset.drop = tr("Laat los om je export in te lezen"); document.body.classList.add("dropping"); });
     addEventListener("dragleave", (e) => { if (!e.relatedTarget) document.body.classList.remove("dropping"); });
     addEventListener("drop", (e) => { e.preventDefault(); document.body.classList.remove("dropping"); readLocalFile(e.dataTransfer.files[0]); });
     document.addEventListener("click", (e) => {
@@ -1316,7 +1319,7 @@ async function poll() {
     const extra = status.bgg_added ? ` + ${num(status.bgg_added)} nieuwe via BGG` : "";
     const labels = { bgstats: `BG Stats-export${extra}`, bgg: "BoardGameGeek", demo: "Demodata" };
     const imported = status.last_import
-      ? ` · Automatisch ingelezen ${new Date(status.last_import.at * 1000).toLocaleString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`
+      ? ` · Automatisch ingelezen ${new Date(status.last_import.at * 1000).toLocaleString(LOCALE, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`
       : "";
     $("source-line").textContent = `Bron: ${labels[status.source]}${imported} · BGG: ${status.bgg}`;
     if (status.error) showNotice(`Bestand niet gelezen. ${status.error}`);
